@@ -4,4 +4,4 @@ frontend/node_modules/
 # Ignore Python virtual environment in the backend folder
 backend/my_env/
 
-backend/.env/
+backend/.env
