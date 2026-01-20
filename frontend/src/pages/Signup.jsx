@@ -1,0 +1,76 @@
+import { useState } from "react";
+import api from "../services/api";
+import { useNavigate, Link } from "react-router-dom";
+
+export default function Signup() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const navigate = useNavigate();
+
+  const submit = async () => {
+    if (password !== confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+
+    try {
+      await api.post("/auth/signup", {
+        username,
+        password,
+        confirm_password: confirmPassword
+      });
+
+      alert("Signup successful. Please login.");
+      navigate("/login");
+
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.detail || "Signup failed");
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="w-full max-w-sm bg-white p-6 rounded-lg shadow">
+        <h1 className="text-2xl font-semibold mb-6 text-center">
+          Create Account
+        </h1>
+
+        <input
+          className="w-full border px-3 py-2 rounded mb-3 focus:outline-none focus:ring"
+          placeholder="Username"
+          onChange={(e) => setUsername(e.target.value)}
+        />
+
+        <input
+          type="password"
+          className="w-full border px-3 py-2 rounded mb-3 focus:outline-none focus:ring"
+          placeholder="Password"
+          onChange={(e) => setPassword(e.target.value)}
+        />
+
+        <input
+          type="password"
+          className="w-full border px-3 py-2 rounded mb-4 focus:outline-none focus:ring"
+          placeholder="Confirm Password"
+          onChange={(e) => setConfirmPassword(e.target.value)}
+        />
+
+        <button
+          onClick={submit}
+          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+        >
+          Sign Up
+        </button>
+
+        <p className="text-sm text-center mt-4 text-gray-600">
+          Already have an account?{" "}
+          <Link to="/login" className="text-blue-600 hover:underline">
+            Login
+          </Link>
+        </p>
+      </div>
+    </div>
+  );
+}

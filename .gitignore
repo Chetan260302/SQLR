@@ -1,0 +1,7 @@
+# Ignore Node dependencies in the frontend folder
+frontend/node_modules/
+
+# Ignore Python virtual environment in the backend folder
+backend/my_env/
+
+backend/.env/
