@@ -5,8 +5,10 @@ export default function ChatInput({ onSend, disabled }) {
 
   const handleSend = async () => {
     if (!text.trim() || disabled) return;
-    await onSend(text);
+    
+    const message=text;
     setText("");
+    await onSend(message);
   };
 
   // Handle "Enter" key to send message

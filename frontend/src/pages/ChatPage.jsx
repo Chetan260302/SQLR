@@ -28,7 +28,7 @@ export default function ChatPage() {
   useEffect(() => {
     if (!currentSession?.id) return;
     loadMessages();
-  }, [currentSession]);
+  }, [currentSession?.id]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -48,7 +48,15 @@ export default function ChatPage() {
 
   const loadMessages = async () => {
     const res = await getMessages(currentSession.id);
-    setMessages(res.data);
+    setMessages(prev => {
+      const map = new Map();
+
+      [...prev, ...res.data].forEach(m => {
+        map.set(m.id, m);
+      });
+
+      return Array.from(map.values());
+    });
   };
 
   /* -------------------- ACTIONS -------------------- */
@@ -70,10 +78,19 @@ export default function ChatPage() {
   const send = async (text) => {
     if (!currentSession?.id) return;
 
-    setMessages((prev) => [...prev, { role: "user", content: text }]);
+    const userMsg = {
+      id: `temp-user-${crypto.randomUUID()}`,
+      role: "user",
+      content: text,
+    };
 
-    // placeholder assistant message
-    setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
+    const assistantMsg = {
+      id: `temp-assistant-${crypto.randomUUID()}`,
+      role: "assistant",
+      content: "",
+    };
+
+    setMessages((prev) => [...prev, userMsg, assistantMsg]);
     setIsStreaming(true);
 
     let assistantText = "";
@@ -85,33 +102,34 @@ export default function ChatPage() {
       (chunk,meta) => {
         console.log("stream meta:",meta)
         
-        if (chunk.startsWith("__META__")) {
-          const metaLine = chunk.split("\n")[0];
+        if (chunk.includes("__META__")) {
+          const [metaPart, rest] = chunk.split("__END_META__");
 
           try {
-            const meta = JSON.parse(metaLine.replace("__META__", ""));
+            const meta = JSON.parse(
+              metaPart.replace("__META__", "").trim()
+            );
 
             if (meta.session_title) {
-              setSessions((prev) =>
-                prev.map((s) =>
+              setSessions(prev =>
+                prev.map(s =>
                   s.id === currentSession.id
                     ? { ...s, title: meta.session_title }
                     : s
                 )
               );
 
-              setCurrentSession((s) => ({
+              setCurrentSession(s => ({
                 ...s,
                 title: meta.session_title
               }));
             }
           } catch (e) {
-            console.error("META parse failed:", e, metaLine);
+            console.error("META parse failed:", e, metaPart);
           }
 
-          // remove META line from chunk before rendering
-          chunk = chunk.replace(metaLine + "\n", "");
-          if (!chunk) return;
+          if (!rest) return;
+          chunk = rest;
         }
 
         assistantText += chunk;
@@ -119,9 +137,10 @@ export default function ChatPage() {
         setMessages((prev) => {
           const updated = [...prev];
           updated[updated.length - 1] = {
-            role: "assistant",
+            ...updated[updated.length - 1],
             content: assistantText
           };
+
           return updated;
         });
       }

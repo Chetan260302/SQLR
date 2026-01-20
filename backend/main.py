@@ -46,17 +46,17 @@ app.add_middleware(
 
 
 try:
-    # llm=ChatGoogleGenerativeAI(
-    #     model="gemini-2.5-flash-lite",
-    #     temperature=0,
-    # )
-
-    llm=ChatOllama(
-        model="qwen2.5-coder:7b-instruct-q4_K_M",
+    llm=ChatGoogleGenerativeAI(
+        model="gemini-2.5-flash-lite",
         temperature=0,
-        num_ctx=4096, # Reduce from default 8192 to 2048
-        num_gpu=20
     )
+
+    # llm=ChatOllama(
+    #     model="qwen2.5-coder:7b-instruct-q4_K_M",
+    #     temperature=0,
+    #     num_ctx=4096, # Reduce from default 8192 to 2048
+    #     num_gpu=20
+    # )
 except Exception as e:
     raise RuntimeError(f"startup failed: {e}")
 
@@ -162,7 +162,7 @@ def login(form_data:OAuth2PasswordRequestForm=Depends(),db:Session=Depends(get_a
     db_user=db.query(User).filter(User.username==form_data.username).first()
     if not db_user or not verify_password(form_data.password,db_user.hashed_password):
         raise HTTPException(status_code=401,detail="Invalid Credentials")
-    token=create_access_token({"sub":str(db_user.id)})
+    token=create_access_token({"sub":db_user.username,"user":str(db_user.id)})
 
     return{
         "access_token":token,
@@ -474,7 +474,7 @@ def chat_message(session_id:int,request:ChatMessageRequest,auth_db:Session=Depen
 
         yield "__META__" + json.dumps({
             "session_title": chat_session.title
-        }) + "\n"
+        }) + "__END_META__"
 
         # send static part immediately
         yield static_part.rstrip() + "\n\n"
@@ -488,7 +488,7 @@ def chat_message(session_id:int,request:ChatMessageRequest,auth_db:Session=Depen
         for token in generate_answer_stream(
             llm=llm,
             question=request.message,
-            columns=metadata["columns"],
+            columns=columns,
             rows=display_rows
         ):
             explanation_chunks.append(token)

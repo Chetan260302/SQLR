@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import {LogOut} from "lucide-react";
 
 export default function Sidebar({
   sessions,
@@ -11,7 +12,7 @@ export default function Sidebar({
 })
 
 {
-  const {logout }=useAuth();
+  const {username,logout }=useAuth();
   const navigate =useNavigate();
 
   console.log("Auth context:", useAuth());
@@ -21,84 +22,79 @@ export default function Sidebar({
     navigate("/login");
   }
   return (
-    
-    <div className="h-full flex flex-col p-3 overflow-y-auto">
-      <div className="md:hidden flex justify-end p-2">
-        <button
-          onClick={onClose}
-          className="text-xl text-gray-600"
-          aria-label="Close sidebar"
-        >
-          ✕
-        </button>
-      </div>
-      
-      <button
-        onClick={onNewChat}
-        className="mb-2 px-3 py-2 rounded bg-blue-600 text-white"
-      >
-        + New Chat
-      </button>
+    <div className="h-full flex flex-col bg-white border-r">
 
-      <button
-        onClick={onAddDatabase}
-        className="mb-4 px-3 py-2 rounded border"
-      >
-        + Add Database
-      </button>
+      {/* 🔹 TOP (Scrollable) */}
+      <div className="flex-1 overflow-y-auto p-3">
 
-      <div className="space-y-1">
-        {sessions.map((s) => (
-          <div
-            key={s.id}
-            onClick={() => onSelect(s)}
-            className="relative group flex items-center gap-2 px-2 py-1 rounded cursor-pointer hover:bg-gray-100"
+        {/* Mobile close */}
+        <div className="md:hidden flex justify-end mb-2">
+          <button
+            onClick={onClose}
+            className="text-xl text-gray-600"
           >
-            <div className="flex-1 truncate px-2">
-            {s.title || "New Chat"}
+            ✕
+          </button>
+        </div>
 
-            {/* TOOLTIP */}
-            {s.title && (
-              <div
-                className="
-                  pointer-events-none
-                  absolute left-full top-1/2 -translate-y-1/2 ml-2
-                  hidden group-hover:block
-                  w-max max-w-xs
-                  rounded
-                  bg-black
-                  text-white
-                  text-xs
-                  px-3 py-2
-                  shadow-lg
-                  z-[9999]
-                  whitespace-normal
-                "
-              >
-                {s.title}
+        <button
+          onClick={onNewChat}
+          className="mb-2 w-full px-3 py-2 rounded bg-blue-600 text-white"
+        >
+          + New Chat
+        </button>
+
+        <button
+          onClick={onAddDatabase}
+          className="mb-4 w-full px-3 py-2 rounded border"
+        >
+          + Add Database
+        </button>
+
+        {/* Sessions */}
+        <div className="space-y-1">
+          {sessions.map((s) => (
+            <div
+              key={s.id}
+              onClick={() => onSelect(s)}
+              className="group relative flex items-center px-2 py-1 rounded cursor-pointer hover:bg-gray-100"
+            >
+              <div className="flex-1 truncate">
+                {s.title || "New Chat"}
               </div>
 
-            )}
-          </div>
-
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete(s.id);
-              }}
-              className="ml-2 text-gray-400 hover:text-red-600"
-            >
-              ✕
-            </button>
-          </div>
-        ))}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete(s.id);
+                }}
+                className="text-gray-400 hover:text-red-600"
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
-      <button
-        onClick={handleLogout}
-        className="mt-4 px-3 py-2 rounded border text-sm text-red-600 hover:bg-red-50"
-      >
-        Logout
-      </button>
+
+      {/* 🔹 BOTTOM (Fixed Footer) */}
+      <div className="border-t px-4 py-3 flex items-center justify-between">
+        <div className="text-sm text-gray-600 truncate">
+          Logged in as
+          <div className="font-medium text-gray-800">
+            {username || "User"}
+          </div>
+        </div>
+
+        <button
+          onClick={handleLogout}
+          className="text-gray-500 hover:text-red-600"
+          title="Logout"
+        >
+          <LogOut size={18} />
+        </button>
+      </div>
     </div>
   );
+
 }

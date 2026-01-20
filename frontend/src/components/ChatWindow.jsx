@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import TypingDots from "./TypingDots";
 
 export default function ChatWindow({ messages, isStreaming }) {
   const bottomRef = useRef(null);
@@ -19,8 +18,8 @@ export default function ChatWindow({ messages, isStreaming }) {
 
         return (
           <div
-            key={i}
-            className={`flex ${isUser ? "justify-end" : "justify-start"}`}
+            key={m.id}
+            className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
           >
             <div
               className={`
@@ -135,7 +134,7 @@ export default function ChatWindow({ messages, isStreaming }) {
       })}
 
       {/* Thinking dots before first token */}
-      {isStreaming &&
+      {/* {isStreaming &&
         messages.length > 0 &&
         messages[messages.length - 1].content === "" && (
           <div className="flex justify-start">
@@ -143,7 +142,7 @@ export default function ChatWindow({ messages, isStreaming }) {
               <TypingDots />
             </div>
           </div>
-        )}
+        )} */}
 
       <div ref={bottomRef} />
     </div>
