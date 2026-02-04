@@ -8,7 +8,7 @@ This project focuses on **schema-aware SQL generation**, **multi-agent orchestra
 
 ## Features
 
-- Natural language → SQL → Answer pipeline  
+- Natural language -> SQL -> Answer pipeline  
 - Multi-agent workflow:
   - **Schema Agent** – extracts only relevant tables & columns
   - **SQL Agent** – generates dialect-aware SQL
@@ -78,4 +78,5 @@ npm run dev
 - Query explanation & optimization hints
 - Role-based DB access
 - Visualization support (charts)
+
 
