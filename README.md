@@ -22,7 +22,7 @@ This project focuses on **schema-aware SQL generation**, **multi-agent orchestra
 
 ---
 
-## 🏗 Tech Stack
+## Tech Stack
 
 **Backend**
 - FastAPI
@@ -62,11 +62,12 @@ DB_SECRET_KEY="your secret" # run this in cmd to get your key [python -c "from c
 ```
 
 ### Run Backend
-``bash
+```bash
 uvicorn main:app --reload
+```
 
 ### Frontend Setup
-``bash
+```bash
 cd frontend
 npm install
 npm run dev
@@ -77,3 +78,4 @@ npm run dev
 - Query explanation & optimization hints
 - Role-based DB access
 - Visualization support (charts)
+
